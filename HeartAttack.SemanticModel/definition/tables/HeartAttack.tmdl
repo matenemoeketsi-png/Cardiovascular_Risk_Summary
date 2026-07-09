@@ -1,0 +1,175 @@
+table HeartAttack
+	lineageTag: c02f13bd-9ca5-4877-90cc-4468aae2889e
+
+	column 'Patient ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8c348efc-6d51-4569-8410-c292121f3c64
+		summarizeBy: count
+		sourceColumn: Patient ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Age
+		dataType: int64
+		formatString: 0
+		lineageTag: ab642790-05eb-4c28-944f-f1d41a9e6a83
+		summarizeBy: sum
+		sourceColumn: Age
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: 6c956e82-c7a0-4bb6-bc95-13f192ef03f3
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Resting BP'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9a4109a7-fda8-40b2-aea6-631a53820672
+		summarizeBy: sum
+		sourceColumn: Resting BP
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cholesterol
+		dataType: int64
+		formatString: 0
+		lineageTag: 3dd66d2c-145c-4768-b42b-810cf1c54504
+		summarizeBy: sum
+		sourceColumn: Cholesterol
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fasting Blood Sugar'
+		dataType: int64
+		formatString: 0
+		lineageTag: 135dfa28-35bc-445b-b04d-55e56e198eea
+		summarizeBy: sum
+		sourceColumn: Fasting Blood Sugar
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Max Heart Rate'
+		dataType: int64
+		formatString: 0
+		lineageTag: adf8bf8a-96ae-45d9-be13-526cf495fd63
+		summarizeBy: sum
+		sourceColumn: Max Heart Rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ST Depression Old Peak'
+		dataType: string
+		lineageTag: cb8a6c05-7e9e-4982-9300-133d452f93bd
+		summarizeBy: none
+		sourceColumn: ST Depression Old Peak
+
+		annotation SummarizationSetBy = Automatic
+
+	column BMI
+		dataType: string
+		lineageTag: f1a9a072-8b0c-4a94-b301-dbdc0e366db7
+		summarizeBy: none
+		sourceColumn: BMI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Smoking Status'
+		dataType: string
+		lineageTag: 7174f377-3c23-454d-9edd-ca45659deade
+		summarizeBy: none
+		sourceColumn: Smoking Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Alcohol Consumption'
+		dataType: string
+		lineageTag: 65cc9acf-6429-4833-a210-930640f4dfca
+		summarizeBy: none
+		sourceColumn: Alcohol Consumption
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Physical Activity'
+		dataType: string
+		lineageTag: e622481b-05a6-4855-b010-11d7824c4a70
+		summarizeBy: none
+		sourceColumn: Physical Activity
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Family History'
+		dataType: int64
+		formatString: 0
+		lineageTag: f05ee9ab-43cb-46a8-b5bb-465e717562e6
+		summarizeBy: sum
+		sourceColumn: Family History
+
+		annotation SummarizationSetBy = Automatic
+
+	column Diabetes
+		dataType: int64
+		formatString: 0
+		lineageTag: 6243191f-7698-4a9e-ba81-68871d58d8db
+		summarizeBy: sum
+		sourceColumn: Diabetes
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Stress Level'
+		dataType: string
+		lineageTag: ce8211a8-1d48-4c3c-befe-d7758b7c53bc
+		summarizeBy: none
+		sourceColumn: Stress Level
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Heart Attack Risk'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7df40b55-5c08-40b1-bd92-ed443acaffed
+		summarizeBy: sum
+		sourceColumn: Heart Attack Risk
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Age Group'
+		dataType: string
+		lineageTag: 2fd0cd20-f8cd-4a23-9f8f-e1b524ff48f4
+		summarizeBy: none
+		sourceColumn: Age Group
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Blood Pressure Risk'
+		dataType: string
+		lineageTag: f34f4215-aef2-4524-bf60-53c03970b095
+		summarizeBy: none
+		sourceColumn: Blood Pressure Risk
+
+		annotation SummarizationSetBy = Automatic
+
+	partition HeartAttack = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\tlekg\OneDrive\Documents\Quant_Portfolio\Data Analysis\Tables\HeartAttack.csv"),[Delimiter=";", Columns=16, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Patient ID", Int64.Type}, {"Age", Int64.Type}, {"Gender", type text}, {"Resting BP", type text}, {"Cholesterol", type text}, {"Fasting Blood Sugar", type text}, {"Max Heart Rate", type text}, {"ST Depression Old Peak", type text}, {"BMI", type text}, {"Smoking Status", type text}, {"Alcohol Consumption", type text}, {"Physical Activity", type text}, {"Family History", Int64.Type}, {"Diabetes", Int64.Type}, {"Stress Level", type text}, {"Heart Attack Risk", Int64.Type}}),
+				    #"Added Conditional Column" = Table.AddColumn(#"Changed Type", "Custom", each if [Age] <= 35 then "Young Adult" else if [Age] <= 55 then "Middle Aged" else if [Age] >= 56 then "Senior" else null),
+				    #"Renamed Columns" = Table.RenameColumns(#"Added Conditional Column",{{"Custom", "Age Group"}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns",{{"Max Heart Rate", Int64.Type}, {"Fasting Blood Sugar", Int64.Type}, {"Cholesterol", Int64.Type}, {"Resting BP", Int64.Type}}),
+				    #"Added Conditional Column1" = Table.AddColumn(#"Changed Type1", "Blood Pressure Risk", each if [Resting BP] = null then "Not Disclosed" else if [Resting BP] < 120 then "Normal" else if [Resting BP] <= 129 then "Elevated" else if [Resting BP] >= 130 then "High Risk (Hypertension)" else null),
+				    #"Replaced Value" = Table.ReplaceValue(#"Added Conditional Column1","NULL","Not Disclosed",Replacer.ReplaceText,{"Smoking Status"})
+				in
+				    #"Replaced Value"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
